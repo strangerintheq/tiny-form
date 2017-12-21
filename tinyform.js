@@ -1,4 +1,4 @@
-// html5 tiny form @ stranger in the q
+
 
 function TinyForm(form, name, closeable) {
     if (typeof form === 'string')
@@ -14,7 +14,6 @@ function TinyForm(form, name, closeable) {
     addDragSupport(form, header);
     var body = appendDiv('body');
     body = addScrollSupport(body);
-
     Array.prototype.slice.call(fragment.childNodes).forEach(function(node){
         body.appendChild(node);
     });
@@ -25,6 +24,8 @@ function TinyForm(form, name, closeable) {
     form.add = addContent;
     closeable && addCloseButton();
     form.hide();
+    form.minWidth = 200;
+    form.minHeight = 200;
     form.addEventListener('mousedown', bringToFront);
     ['top', 'left', 'width', 'height'].forEach(loadFromLocalStorage);
     window.addEventListener('resize', resizeWindow);
@@ -47,6 +48,8 @@ function TinyForm(form, name, closeable) {
 
     function resizeWindow() {
         if (form.style.display === "block") {
+            clampAndSet('width', form.offsetWidth, form.minWidth, window.innerWidth - form.offsetWidth);
+            clampAndSet('height', form.offsetHeight, form.minWidth, window.innerHeight - form.offsetHeight);
             clampAndSet('left', form.offsetLeft, 0, window.innerWidth - form.offsetWidth);
             clampAndSet('top', form.offsetTop, 0, window.innerHeight - form.offsetHeight);
         }
