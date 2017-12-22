@@ -1,0 +1,23 @@
+{
+  "name": "tiny-form",
+  "version": "1.0.0",
+  "description": "https://rawgit.com/strangerintheq/tiny-form/master/example.html",
+  "main": "tinyform.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strangerintheq/tiny-form.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/strangerintheq/tiny-form/issues"
+  },
+  "homepage": "https://github.com/strangerintheq/tiny-form#readme",
+  "devDependencies": {
+    "gulp-jasmine": "^2.4.2",
+    "gulp-task-builder": "git+https://github.com/strangerintheq/gulp-task-builder.git#1.0.7"
+  }
+}

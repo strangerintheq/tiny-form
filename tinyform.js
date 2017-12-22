@@ -1,74 +1,112 @@
+function TinyForm(form) {
 
-
-function TinyForm(form, name, closeable) {
     if (typeof form === 'string')
         form = document.querySelector(form);
-    var fragment = document.createDocumentFragment();
-    Array.prototype.slice.call(form.childNodes).forEach(function(node) {
-        fragment.appendChild(node);
-    });
-    form.innerHTML = '';
-    form.classList.add('form');
-    var header = appendDiv('header');
-    header.innerHTML = name;
-    addDragSupport(form, header);
-    var body = appendDiv('body');
-    body = addScrollSupport(body);
-    Array.prototype.slice.call(fragment.childNodes).forEach(function(node){
-        body.appendChild(node);
-    });
-    addResizeSupport(form);
-    form.hide = assign.bind(form.style, 'display', 'none');
-    form.show = show;
-    form.clear = assign.bind(body, 'innerHTML', '');
-    form.add = addContent;
-    closeable && addCloseButton();
-    form.hide();
-    form.minWidth = 200;
-    form.minHeight = 200;
-    form.addEventListener('mousedown', bringToFront);
-    ['top', 'left', 'width', 'height'].forEach(loadFromLocalStorage);
-    window.addEventListener('resize', resizeWindow);
-    return form;
 
-    function show() {
-        form.style.display = 'block';
-        resizeWindow();
-        bringToFront();
-        body.update && body.update();
+    var tf = form.tinyform = { // all in properties holder
+        minWidth: 200, minHeight: 100
+    };
+
+    dom(form);
+    init();
+    assignFunctions();
+    return form.hide();
+
+    function assignFunctions() {
+        form.clear = chain(assign.bind(form.body, 'innerHTML', ''));
+
+        form.header = chain(function (text) {
+            tf.header.add(text);
+        });
+
+        form.dragggable = chain(function () {
+            addDragSupport(form, tf.header);
+        });
+
+        form.show = chain(function () {
+            form.style.display = 'block';
+            resizeWindow();
+            bringToFront();
+            tf.body.update && tf.body.update();
+        });
+
+        form.add = chain(function (content) {
+            addContent(content, tf.body);
+        });
+
+        form.closeable = chain(function () {
+            var svgCross = '<svg viewBox="0 0 21 21"><path stroke="white" stroke-width="2" d="M5,5 L16,16 M5,16 L16,5"/></svg>';
+            dom().class('closer').add(svgCross).click(form.hide).appendTo(form);
+        });
+
+        form.resizeable = chain(function (minWidth, minHeight, maxWidth, maxHeight) {
+            tf.minWidth = minWidth;
+            tf.minHeight = minHeight;
+            tf.maxWidth = maxWidth;
+            tf.maxHeight = maxHeight;
+            addResizeSupport(form);
+        });
+
+        form.center = chain(function (always) {
+            tf.center = true;
+            tf.alwaysCenter = always;
+        });
     }
 
-    function addContent(content) {
-        if (typeof content === "string")
-            body.innerHTML += content;
-        else
-            body.appendChild(content);
-        body.update && body.update();
+    function init() {
+        form.classList.add('form');
+        var fragment = document.createDocumentFragment();
+        Array.prototype.slice.call(form.childNodes).forEach(function(node) {
+            fragment.appendChild(node);
+        });
+        form.innerHTML = '';
+        tf.header = appendDiv('header');
+        tf.body = appendDiv('body');
+        tf.body = addScrollSupport(tf.body);
+        Array.prototype.slice.call(fragment.childNodes).forEach(function(node) {
+            tf.body.appendChild(node);
+        });
+        form.addEventListener('mousedown', bringToFront);
+        //   ['top', 'left', 'width', 'height'].forEach(loadFromLocalStorage);
+        window.addEventListener('resize', resizeWindow);
     }
 
     function resizeWindow() {
         if (form.style.display === "block") {
-            clampAndSet('width', form.offsetWidth, form.minWidth, window.innerWidth - form.offsetWidth);
-            clampAndSet('height', form.offsetHeight, form.minWidth, window.innerHeight - form.offsetHeight);
+            clampAndSet('width', form.offsetWidth, tf.minWidth, window.innerWidth - form.offsetWidth);
+            clampAndSet('height', form.offsetHeight, tf.minHeight, window.innerHeight - form.offsetHeight);
             clampAndSet('left', form.offsetLeft, 0, window.innerWidth - form.offsetWidth);
             clampAndSet('top', form.offsetTop, 0, window.innerHeight - form.offsetHeight);
         }
     }
-    
+
     function assign(property, value) {
         this[property] = value;
     }
 
-    function addCloseButton() {
-        var closer = appendDiv('closer');
-        closer.innerHTML = '<svg viewBox="0 0 21 21"><path stroke="white" stroke-width="2" d="M5,5 L16,16 M5,16 L16,5"/></svg>';
-        closer.onclick = form.hide;
+    function dom(tag) {
+        tag = tag === undefined ? 'div' : tag;
+        tag = typeof tag === 'string' ? document.createElement(tag) : tag;
+        tag.html = chain(function (html) {tag.innerHTML = html}, tag);
+        tag.class = chain(function (name) {tag.classList.add(name)}, tag);
+        tag.hide = chain(assign.bind(tag.style, 'display', 'none'), tag);
+        tag.show = chain(assign.bind(tag.style, 'display', 'block'), tag);
+        tag.click = chain(function (action) {tag.addEventListener('click', action, true)}, tag);
+        tag.add = chain(function (content) {addContent(content, tag)}, tag);
+        tag.appendTo = chain(function (to) {to.appendChild(tag)}, tag);
+        return tag;
+    }
+
+    function addContent(content, to) {
+        if (typeof content === "string")
+            (to || tf.body).innerHTML += content;
+        else
+            (to || tf.body).appendChild(content);
+        !to && tf.body.update && tf.body.update();
     }
 
     function appendDiv(classes, to) {
-        var div = document.createElement('div');
-        div.className = classes;
-        return (to || form).appendChild(div);
+        return dom().class(classes).appendTo(to || form);
     }
 
     function evt(e) {
@@ -109,6 +147,13 @@ function TinyForm(form, name, closeable) {
         return Math.min(Math.max(min, value), max);
     }
 
+    function chain(func, obj) {
+        return function () {
+            func.apply(null, arguments);
+            return (obj || form);
+        };
+    }
+
     function addDragSupport(form, activeDragZone) {
         var init = {}, mouse;
         addListeners(['mousedown', 'touchstart'], startDrag, activeDragZone || form);
@@ -144,9 +189,9 @@ function TinyForm(form, name, closeable) {
 
         function resizeElement(event) {
             var current = evt(event);
-            clampAndSet('height', initY + current.y - mouse.y, 200, window.innerHeight - form.offsetTop);
-            clampAndSet('width', initX + current.x - mouse.x, 200, window.innerWidth - form.offsetLeft);
-            body.update && body.update();
+            clampAndSet('height', initY + current.y - mouse.y, tf.minWidth, window.innerHeight - form.offsetTop);
+            clampAndSet('width', initX + current.x - mouse.x, tf.minHeight, window.innerWidth - form.offsetLeft);
+            tf.body.update && tf.body.update();
         }
     }
 
@@ -159,7 +204,7 @@ function TinyForm(form, name, closeable) {
         content.update = update;
         scroll.addEventListener('mousewheel', onWheel);
         knob.addEventListener('mousedown', onMouseDown);
-        update();
+        // update();
         return content;
 
         function update() {
