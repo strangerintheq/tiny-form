@@ -1,47 +1,61 @@
 module.exports = function (tag) {
     tag = tag === undefined ? 'div' : tag;
     tag = typeof tag === 'string' ? document.createElement(tag) : tag;
-    tag.html = chain(function (html) {
+
+    tag.show = c(assign.bind(tag.style, 'display', 'block'));
+    tag.hide = c(assign.bind(tag.style, 'display', 'none'));
+
+    tag.html = c(function content(html) {
         tag.innerHTML = html
-    }, tag);
-    tag.class = chain(function (name) {
-        tag.classList.add(name)
-    }, tag);
-    tag.hide = chain(assign.bind(tag.style, 'display', 'none'), tag);
-    tag.show = chain(assign.bind(tag.style, 'display', 'block'), tag);
-    tag.click = chain(function (action) {
+    });
+
+    tag.class = c(function (name, remove) {
+        tag.classList[remove ? 'remove' : 'add'](name)
+    });
+
+    tag.click = c(function (action) {
         tag.addEventListener('click', action, true)
-    }, tag);
-    tag.add = chain(function (content) {
+    });
+
+    tag.add = c(function (content) {
         add(content, tag)
-    }, tag);
-    tag.appendTo = chain(function (to) {
+    });
+
+    tag.appendTo = c(function (to) {
         to.appendChild(tag)
-    }, tag);
+    });
+
     return tag;
+
+    function c(func) {
+        return chain(func, tag)
+    }
 };
 
 module.exports.chain = chain;
 module.exports.add = add;
 module.exports.assign = assign;
-module.exports.clamp = clamp;
-module.exports.mouseUp = mouseUp;
-module.exports.addListeners = addListeners;
+module.exports.addMoveEvent = addMoveEvent;
+module.exports.listen = listen;
 module.exports.evt = evt;
 
-function mouseUp(func) {
-    window.removeEventListener('mousemove', func);
-    window.removeEventListener('touchmove', func);
+var moveEventNames = ['mousemove', 'touchmove'];
+var upEventNames = ['mouseup', 'touchend'];
+
+function addMoveEvent(func) {
+    listen(moveEventNames, func);
+    listen(upEventNames, endMove);
+
+    function endMove() {
+        listen(moveEventNames, func, window, true);
+        listen(upEventNames, endMove, window, true);
+    }
 }
 
-function addListeners(eventNames, func, target) {
+function listen(eventNames, func, target, remove) {
     eventNames.forEach(function (name) {
-        (target || window).addEventListener(name, func);
+        (target || window)[(remove ? 'remove' : 'add') + 'EventListener'](name, func);
     });
-}
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(min, value), max);
 }
 
 function chain(func, obj) {

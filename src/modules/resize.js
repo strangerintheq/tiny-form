@@ -3,21 +3,20 @@ var dom = require('./dom');
 module.exports = function (form) {
     var initX, initY, mouse;
     var resizer = dom().class('resizer').appendTo(form);
-    resizer.innerHTML = '<svg viewBox="0 0 21 21"><path stroke="wheat" d="M4,19 L19,4 M8,19 L19,8 M12,19 L19,12"/></svg>';
-    dom.addListeners(['mousedown', 'touchstart'], startResize, resizer);
+    resizer.innerHTML = '<svg viewBox="0 0 21 21"><path stroke="lightgray" d="M8,19 L19,8 M12,19 L19,12"/></svg>';
+    dom.listen(['mousedown', 'touchstart'], startResize, resizer);
 
     function startResize(event) {
-        initX = form.offsetWidth;
-        initY = form.offsetHeight;
+        initX = form.clientWidth;
+        initY = form.clientHeight;
         mouse = dom.evt(event);
-        dom.addListeners(['mousemove', 'touchmove'], resizeElement);
-        dom.addListeners(['mouseup', 'touchend'], dom.mouseUp.bind(null, resizeElement));
+        dom.addMoveEvent(resizeElement);
     }
 
     function resizeElement(event) {
         var current = dom.evt(event);
-        form.clampAndSet('height', initY + current.y - mouse.y, form.tinyform.minWidth, window.innerHeight - form.offsetTop);
-        form.clampAndSet('width', initX + current.x - mouse.x, form.tinyform.minHeight, window.innerWidth - form.offsetLeft);
+        form.clampAndSet('height', initY + current.y - mouse.y, form.tinyform.minHeight, innerHeight - form.clientTop);
+        form.clampAndSet('width', initX + current.x - mouse.x, form.tinyform.minWidth, innerWidth - form.clientLeft);
         form.update()
     }
 };

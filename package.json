@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/strangerintheq/tiny-form#readme",
   "devDependencies": {
+    "gulp-css2js": "^1.0.2",
     "gulp-jasmine": "^2.4.2",
     "gulp-task-builder": "git+https://github.com/strangerintheq/gulp-task-builder.git#1.0.7"
   }

@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
     <title>Tiny Form 1.0</title>
 
-    <link rel="stylesheet" href="tinyform.css"/>
-    <script src="bin/tinyform.js"></script>
+    <link rel="stylesheet" href="css/tinyform.css"/>
+    <script src="bin/min/tinyform.js"></script>
     <style>
         body {
-            background-color: #4488bb;
+            /*background-color: #4488bb;*/
             margin: 0;
-            font-family: Verdana,sans-serif;
-            overflow-x: hidden;
+            /*font-family: Verdana,sans-serif;*/
+            overflow: hidden;
         }
     </style>
 </head>
@@ -39,11 +39,11 @@
     </div>
 
     <script>
-        var a = TinyForm('#tinyForm')
+        TinyForm('#tinyForm')
             .header('Tiny Form')
             .closeable()
             .dragggable()
-            .resizeable(200, 100, 300, 300)
+            .resizeable()
             .show();
     </script>
 

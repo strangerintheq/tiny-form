@@ -18,7 +18,7 @@ module.exports = function (scroll) {
     }
 
     function onMouseMove(e) {
-        var pos = dom.clamp(start + e.clientY, 0, viewport.offsetHeight - knob.offsetHeight);
+        var pos = Math.clamp(start + e.clientY, 0, viewport.offsetHeight - knob.offsetHeight);
         viewport.scrollTop = pos / k();
         knob.style.top = pos + "px";
     }
@@ -27,13 +27,13 @@ module.exports = function (scroll) {
         start = knob.offsetTop - e.clientY;
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
-        knob.parentNode.classList.add('active');
+        track.class('active');
     }
 
     function onMouseUp() {
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
-        knob.parentNode.classList.remove('active');
+        track.class('active', true);
     }
 
     function onWheel(e) {

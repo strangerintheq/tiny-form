@@ -4,7 +4,7 @@ function TinyForm(form) {
         form = document.querySelector(form);
 
     var tf = form.tinyform = { // all in properties holder
-        minWidth: 200, minHeight: 100
+        minWidth: 300, minHeight: 200
     };
 
     dom(form);
@@ -16,11 +16,11 @@ function TinyForm(form) {
         form.clear = chain(assign.bind(form.body, 'innerHTML', ''));
 
         form.header = chain(function (text) {
-            tf.header.add(text);
+            tf.header.show().add(text);
         });
 
         form.dragggable = chain(function () {
-            addDragSupport(form, tf.header);
+            addDragSupport(form, tf.header.style.display === 'none' ? form : tf.header);
         });
 
         form.show = chain(function () {
@@ -189,8 +189,8 @@ function TinyForm(form) {
 
         function resizeElement(event) {
             var current = evt(event);
-            clampAndSet('height', initY + current.y - mouse.y, tf.minWidth, window.innerHeight - form.offsetTop);
-            clampAndSet('width', initX + current.x - mouse.x, tf.minHeight, window.innerWidth - form.offsetLeft);
+            clampAndSet('height', initY + current.y - mouse.y, tf.minHeight, window.innerHeight - form.offsetTop);
+            clampAndSet('width', initX + current.x - mouse.x, tf.minWidth, window.innerWidth - form.offsetLeft);
             tf.body.update && tf.body.update();
         }
     }
