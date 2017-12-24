@@ -25,7 +25,7 @@ window.TinyForm = function (form) {
         form.clear = dom.chain(dom.assign.bind(form.body, 'innerHTML', ''));
 
         form.header = dom.chain(function (text) {
-            tf.header.add(text);
+            tf.header.show().add(text);
         }, form);
 
         form.dragggable = dom.chain(function () {
