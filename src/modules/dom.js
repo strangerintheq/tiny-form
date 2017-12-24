@@ -42,13 +42,14 @@ module.exports.evt = evt;
 var moveEventNames = ['mousemove', 'touchmove'];
 var upEventNames = ['mouseup', 'touchend'];
 
-function addMoveEvent(func) {
+function addMoveEvent(func, endFunc) {
     listen(moveEventNames, func);
     listen(upEventNames, endMove);
 
     function endMove() {
         listen(moveEventNames, func, window, true);
         listen(upEventNames, endMove, window, true);
+        endFunc();
     }
 }
 

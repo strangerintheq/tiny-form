@@ -8,7 +8,7 @@ module.exports = function (scroll) {
     var content = dom().class('scroll-content').appendTo(viewport);
     content.update = update;
     scroll.addEventListener('mousewheel', onWheel);
-    knob.addEventListener('mousedown', onMouseDown);
+    dom.listen(['mousedown', 'touchstart'], onMouseDown, knob);
     return content;
 
     function update() {
@@ -18,21 +18,20 @@ module.exports = function (scroll) {
     }
 
     function onMouseMove(e) {
-        var pos = Math.clamp(start + e.clientY, 0, viewport.offsetHeight - knob.offsetHeight);
+        e = dom.evt(e);
+        var pos = Math.clamp(start + e.y, 0, viewport.offsetHeight - knob.offsetHeight);
         viewport.scrollTop = pos / k();
         knob.style.top = pos + "px";
     }
 
     function onMouseDown(e) {
-        start = knob.offsetTop - e.clientY;
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        e = dom.evt(e);
+        start = knob.offsetTop - e.y;
         track.class('active');
+        dom.addMoveEvent(onMouseMove, onMouseUp)
     }
 
     function onMouseUp() {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
         track.class('active', true);
     }
 
