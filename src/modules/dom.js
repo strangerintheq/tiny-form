@@ -49,7 +49,7 @@ function addMoveEvent(func, endFunc) {
     function endMove() {
         listen(moveEventNames, func, window, true);
         listen(upEventNames, endMove, window, true);
-        endFunc();
+        endFunc && endFunc();
     }
 }
 
