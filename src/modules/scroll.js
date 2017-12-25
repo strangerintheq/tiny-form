@@ -1,14 +1,15 @@
 var dom = require('./dom');
+var events = require('./events');
 
 module.exports = function (scroll) {
     var start;
-    var viewport = dom().class('viewport').appendTo(scroll);
-    var track = dom().class('track').appendTo(scroll);
-    var knob = dom().class('knob').appendTo(track);
-    var content = dom().class('scroll-content').appendTo(viewport);
+    var viewport = dom.div('viewport', scroll);
+    var track = dom.div('track', scroll);
+    var knob = dom.div('knob', track);
+    var content = dom.div('scroll-content', viewport);
     content.update = update;
     scroll.addEventListener('mousewheel', onWheel);
-    dom.listen(['mousedown', 'touchstart'], onMouseDown, knob);
+    events.listen(events.down, onMouseDown, knob);
     return content;
 
     function update() {
@@ -18,17 +19,17 @@ module.exports = function (scroll) {
     }
 
     function onMouseMove(e) {
-        e = dom.evt(e);
+        e = events.evt(e);
         var pos = Math.clamp(start + e.y, 0, viewport.offsetHeight - knob.offsetHeight);
         viewport.scrollTop = pos / k();
         knob.style.top = pos + "px";
     }
 
     function onMouseDown(e) {
-        e = dom.evt(e);
+        e = events.evt(e);
         start = knob.offsetTop - e.y;
         track.class('active');
-        dom.addMoveEvent(onMouseMove, onMouseUp)
+        events.addMoveEvent(onMouseMove, onMouseUp);
     }
 
     function onMouseUp() {
@@ -36,8 +37,7 @@ module.exports = function (scroll) {
     }
 
     function onWheel(e) {
-        var delta = e.deltaY;
-        viewport.scrollTop += delta / 2;
+        viewport.scrollTop += e.deltaY;
         knob.style.top = viewport.scrollTop * k() + "px";
         e.preventDefault();
     }

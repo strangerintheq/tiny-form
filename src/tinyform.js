@@ -1,3 +1,4 @@
+var events = require('./modules/events');
 var dom = require('./modules/dom');
 var drag = require('./modules/drag');
 var scroll = require('./modules/scroll');
@@ -45,7 +46,7 @@ window.TinyForm = function (form) {
 
         form.closeable = dom.chain(function () {
             var svgCross = '<svg viewBox="0 0 21 21"><path d="M5,5 L16,16 M5,16 L16,5"/></svg>';
-            dom().class('closer').add(svgCross).click(form.hide).appendTo(form);
+            dom.div('closer', form).add(svgCross).click(form.hide);
         }, form);
 
         form.resizeable = dom.chain(function (minWidth, minHeight, maxWidth, maxHeight) {
@@ -71,14 +72,14 @@ window.TinyForm = function (form) {
         iterate(form.childNodes, function(node) {
             fragment.appendChild(node);
         });
-        form.innerHTML = '';
-        tf.header = dom().class('header').hide().appendTo(form);
-        tf.body = dom().class('body').appendTo(form);
+        form.html();
+        tf.header = dom.div('header', form).hide();
+        tf.body = dom.div('body', form);
         tf.body = scroll(tf.body);
         iterate(fragment.childNodes, function(node) {
             tf.body.appendChild(node);
         });
-        form.addEventListener('mousedown', bringToFront);
+        events.listen(events.down, bringToFront);
         ['top', 'left', 'width', 'height'].forEach(loadFromLocalStorage);
         window.addEventListener('resize', resizeWindow);
     }
@@ -110,7 +111,7 @@ window.TinyForm = function (form) {
 
     function loadFromLocalStorage(property) {
         var value = localStorage.getItem('tynyform.' + form.id + '.' + property);
-        if (value) form.style[property] = (+JSON.parse(value)) + 'px';
+        if (value) form.style[property] = +JSON.parse(value) + 'px';
     }
 
     function clampAndSet(parameter, value, min, max) {
