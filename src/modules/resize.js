@@ -3,9 +3,9 @@ var events = require('./events');
 
 module.exports = function (form) {
     var initX, initY, mouse;
-    var resizer = dom.div('resizer', form)
-        .add('<svg viewBox="0 0 21 21"><path stroke="lightgray" d="M8,19 L19,8 M12,19 L19,12"/></svg>');
-    events.listen(events.down, startResize, resizer);
+
+    events.listen(events.down, startResize, dom.div('resizer', form)
+        .add(dom.svg(21, "M8,19 L19,8 M12,19 L19,12")));
 
     function startResize(event) {
         initX = form.clientWidth;

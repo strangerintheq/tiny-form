@@ -3,8 +3,15 @@ var dom = module.exports = function (tag) {
     tag = tag === undefined ? 'div' : tag;
     tag = typeof tag === 'string' ? document.createElement(tag) : tag;
 
-    tag.show = c(dom.assign.bind(tag.style, 'display', 'block'));
-    tag.hide = c(dom.assign.bind(tag.style, 'display', 'none'));
+    tag.show = c(st('display', 'block'));
+    tag.hide = c(st('display', 'none'));
+    tag.abs = c(st('position', 'absolute'));
+    tag.left = c(px('left'));
+    tag.top = c(px('top'));
+    tag.right = c(px('right'));
+    tag.bottom = c(px('bottom'));
+    tag.width = c(px('width'));
+    tag.height = c(px('height'));
 
     tag.html = c(function content(html) {
         tag.innerHTML = html || ''
@@ -31,6 +38,16 @@ var dom = module.exports = function (tag) {
     function c(func) {
         return dom.chain(func, tag)
     }
+
+    function px(name) {
+        return function (value) {
+            tag.style[name] = value + 'px';
+        }
+    }
+
+    function st(param, value) {
+        return dom.assign.bind(tag.style, param, value)
+    }
 };
 
 dom.div = function (className, to) {
@@ -45,12 +62,16 @@ dom.chain = function (func, obj) {
 };
 
 dom.add = function (content, to) {
-    if (typeof content === "string")
+    if (typeof content === 'string')
         to.innerHTML += content;
     else
         to.appendChild(content);
 };
 
-dom.assign =function (property, value) {
+dom.assign = function (property, value) {
     this[property] = value;
+};
+
+dom.svg = function (size, pathD) {
+    return '<svg viewBox="0 0 ' + size + ' ' + size + '"><path d="' + pathD + '"/></svg>'
 };

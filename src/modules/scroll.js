@@ -14,15 +14,15 @@ module.exports = function (scroll) {
 
     function update() {
         var K = k();
-        knob.style.height = (K < 1 ? K * scroll.offsetHeight : 0) + "px";
-        knob.style.top = viewport.scrollTop * K + "px";
+        knob.height(K < 1 ? K * scroll.offsetHeight : 0);
+        knob.top(viewport.scrollTop * K);
     }
 
     function onMouseMove(e) {
         e = events.evt(e);
         var pos = Math.clamp(start + e.y, 0, viewport.offsetHeight - knob.offsetHeight);
         viewport.scrollTop = pos / k();
-        knob.style.top = pos + "px";
+        knob.top(pos);
     }
 
     function onMouseDown(e) {
@@ -38,7 +38,7 @@ module.exports = function (scroll) {
 
     function onWheel(e) {
         viewport.scrollTop += e.deltaY;
-        knob.style.top = viewport.scrollTop * k() + "px";
+        knob.top(viewport.scrollTop * k());
         e.preventDefault();
     }
 

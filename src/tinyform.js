@@ -14,7 +14,8 @@ window.TinyForm = function (form) {
         form = document.querySelector(form);
 
     var tf = form.tinyform = { // all in properties holder
-        minWidth: 300, minHeight: 140
+        minWidth: 300, minHeight: 140,
+        key: 'tynyform.' + form.id + '.'
     };
 
     dom(form);
@@ -23,7 +24,8 @@ window.TinyForm = function (form) {
     return form.hide();
 
     function assignFunctions() {
-        form.clear = dom.chain(dom.assign.bind(form.body, 'innerHTML', ''));
+
+        form.clear = dom.chain(form.html.bind(''));
 
         form.header = dom.chain(function (text) {
             tf.header.show().add(text);
@@ -45,8 +47,8 @@ window.TinyForm = function (form) {
         }, form);
 
         form.closeable = dom.chain(function () {
-            var svgCross = '<svg viewBox="0 0 21 21"><path d="M5,5 L16,16 M5,16 L16,5"/></svg>';
-            dom.div('closer', form).add(svgCross).click(form.hide);
+            dom.div('closer', form).click(form.hide).abs().top(0).right(0)
+                .add(dom.svg(21, "M5,5 L16,16 M5,16 L16,5"));
         }, form);
 
         form.resizeable = dom.chain(function (minWidth, minHeight, maxWidth, maxHeight) {
@@ -67,12 +69,11 @@ window.TinyForm = function (form) {
     }
 
     function init() {
-        form.classList.add('form');
         var fragment = document.createDocumentFragment();
         iterate(form.childNodes, function(node) {
             fragment.appendChild(node);
         });
-        form.html();
+        form.class('form').abs().html();
         tf.header = dom.div('header', form).hide();
         tf.body = dom.div('body', form);
         tf.body = scroll(tf.body);
@@ -82,6 +83,7 @@ window.TinyForm = function (form) {
         events.listen(events.down, bringToFront);
         ['top', 'left', 'width', 'height'].forEach(loadFromLocalStorage);
         window.addEventListener('resize', resizeWindow);
+        bringToFront();
     }
 
     function resizeWindow() {
@@ -109,15 +111,15 @@ window.TinyForm = function (form) {
         form.style.zIndex = 10000;
     }
 
-    function loadFromLocalStorage(property) {
-        var value = localStorage.getItem('tynyform.' + form.id + '.' + property);
-        if (value) form.style[property] = +JSON.parse(value) + 'px';
+    function loadFromLocalStorage(parameter) {
+        var value = localStorage.getItem(tf.key + parameter);
+        if (value) form[parameter](+JSON.parse(value));
     }
 
     function clampAndSet(parameter, value, min, max) {
         value = Math.clamp(value, min, max);
-        form.style[parameter] = value + 'px';
-        localStorage.setItem('tynyform.' + form.id + '.' + parameter, JSON.stringify(value));
+        form[parameter](value);
+        localStorage.setItem(tf.key + parameter, JSON.stringify(value));
     }
     
     function iterate(nodes, func) {
