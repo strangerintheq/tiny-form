@@ -2,11 +2,11 @@
 .form {
   position: absolute;
   z-index: 2000;
-  /*background-color: rgba(0,0,0,0.5);*/
+  background-color: rgba(0,0,0,0.5);
   box-shadow: 0 0 10px 0 lightgray;
-  /*border-radius: 5px;*/ 
-  /*color: white;*/
-  /*font-family: sans-serif;*/
+  border-radius: 5px;
+  color: white;
+  font-family: sans-serif;
   user-select: none;
 }
 
